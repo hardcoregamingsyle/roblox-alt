@@ -1,0 +1,110 @@
+openapi: 3.1.0
+info:
+  title: NexusEngine Platform API
+  version: 1.0.0
+  description: High-performance backend API for the NexusEngine platform.
+  contact:
+    name: NexusEngine Security Team
+    email: security@nexusengine.internal
+
+servers:
+  - url: https://api.nexusengine.internal/v1
+    description: Production API Gateway
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    RateLimitError:
+      description: Too many requests
+      headers:
+        Retry-After: { schema: { type: integer } }
+    UnauthorizedError:
+      description: Access token missing or invalid
+    BadRequest:
+      description: Invalid request payload
+
+paths:
+  /auth/login:
+    post:
+      summary: Authenticate user
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username: { type: string, minLength: 3, maxLength: 32 }
+                password: { type: string, minLength: 8, maxLength: 128 }
+      responses:
+        '200':
+          description: Successful authentication
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token: { type: string }
+        '401': { $ref: '#/components/responses/UnauthorizedError' }
+
+  /assets/upload:
+    post:
+      summary: Request secure asset upload URL
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [fileType]
+              properties:
+                fileType: { type: string, enum: [model, texture, audio] }
+      responses:
+        '200':
+          description: Presigned URL returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  assetId: { type: string }
+                  url: { type: string }
+        '400': { $ref: '#/components/responses/BadRequest' }
+
+  /game/discovery:
+    get:
+      summary: Get trending game instances
+      responses:
+        '200':
+          description: List of trending games
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id: { type: string }
+                    title: { type: string }
+                    popularity: { type: integer }
+
+  /game/instance/{id}:
+    get:
+      summary: Get game instance connection details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Connection string
+        '403':
+          description: Access denied (ACL check failed)

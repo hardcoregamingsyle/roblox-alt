@@ -1,0 +1,29 @@
+apiVersion: agones.dev/v1
+kind: GameServer
+metadata:
+  name: nexus-game-server
+spec:
+  ports:
+  - name: game
+    portPolicy: Dynamic
+    containerPort: 3000
+    protocol: UDP
+  template:
+    spec:
+      containers:
+      - name: game-server
+        image: nexusengine/game-server:latest
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        readinessProbe:
+          exec:
+            command: ["/bin/sh", "-c", "pgrep NexusClient"]
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        env:
+        - name: INSTANCE_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name

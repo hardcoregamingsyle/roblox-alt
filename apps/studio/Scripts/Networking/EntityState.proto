@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package NexusNetwork;
+
+message EntityTransform {
+    uint64 entity_id = 1;
+    float pos_x = 2;
+    float pos_y = 3;
+    float pos_z = 4;
+    float rot_x = 5;
+    float rot_y = 6;
+    float rot_z = 7;
+}
+
+message WorldSnapshot {
+    uint64 timestamp = 1;
+    repeated EntityTransform entities = 2;
+}

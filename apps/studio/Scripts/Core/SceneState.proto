@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package NexusStudio.Core;
+
+message EntityData {
+    uint64 id = 1;
+    string type = 2;
+    map<int32, string> properties = 3;
+    repeated EntityData children = 4;
+}
+
+message SceneBundle {
+    uint32 version = 1;
+    string scene_name = 2;
+    repeated EntityData root_entities = 3;
+}

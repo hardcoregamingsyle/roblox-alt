@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "dependencies": {
+    "GodotSharp": "4.3.0",
+    "Newtonsoft.Json": "13.0.3",
+    "Protobuf-net": "3.2.30"
+  }
+}
