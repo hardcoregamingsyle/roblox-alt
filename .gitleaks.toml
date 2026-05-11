@@ -1,0 +1,10 @@
+[rules]
+[rules.generic-secret]
+description = "High entropy secret"
+regex = '(?i)(api_key|secret|password|passwd|token|auth)["\s]*[:=]["\s]*[a-zA-Z0-9+/]{32,}'
+[rules.jwt]
+description = "JWT Token"
+regex = 'eyJ[A-Za-z0-9-_]+\.eyJ[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+'
+[rules.aws-s3-key]
+description = "AWS S3 Access Key"
+regex = '(?i)AKIA[0-9A-Z]{16}'
