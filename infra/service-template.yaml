@@ -1,0 +1,16 @@
+spec:
+  template:
+    spec:
+      securityContext: { runAsNonRoot: true, seccompProfile: { type: RuntimeDefault } }
+      volumes:
+      - name: tmp-volume
+        emptyDir: { medium: Memory, sizeLimit: 256Mi }
+      containers:
+      - name: api
+        readinessProbe:
+          httpGet: { path: /health, port: 8080 }
+          scheme: HTTP
+        securityContext: { readOnlyRootFilesystem: true, allowPrivilegeEscalation: false, capabilities: { drop: ["ALL"] } }
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp-volume
