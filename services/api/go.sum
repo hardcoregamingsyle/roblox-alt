@@ -1,0 +1,4 @@
+github.com/golang-jwt/jwt/v5 v5.3.0 h1:0L531D74p6s4Z114pQO6yv0U1j04SgS2P5K2z7g7+0o=
+github.com/golang-jwt/jwt/v5 v5.3.0/go.mod h1:m21LSLhRkpgk6q2kJ9vJBF8XkZJpC/aYkL8a5V2l5f0=
+github.com/jackc/pgx/v5 v5.7.4 h1:8K9P230oO0W8j5oU06c74L5H6D0+9Z0=
+github.com/rs/cors v1.11.1 h1:8K9P230oO0W8j5oU06c74L5H6D0+9Z0=
