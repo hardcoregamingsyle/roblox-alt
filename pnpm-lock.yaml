@@ -1,0 +1,10 @@
+lockfileVersion: '9.0'
+importers:
+  .:
+    dependencies:
+      eslint: 9.23.1
+  packages/db:
+    dependencies:
+      '@prisma/client': 5.22.0
+    devDependencies:
+      prisma: 5.22.0
