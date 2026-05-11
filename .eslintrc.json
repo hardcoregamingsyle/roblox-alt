@@ -1,0 +1,7 @@
+{
+  "root": true,
+  "overrides": [{
+    "files": ["apps/**/*.ts", "services/**/*.ts"],
+    "rules": { "@typescript-eslint/no-explicit-any": "error" }
+  }]
+}
