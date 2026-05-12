@@ -1,14 +1,17 @@
-# NexusEngine Binary Contract
-## Memory Layout (Pack=8)
-To prevent info disclosure and ensure deterministic cross-architecture alignment, all structs MUST use `Pack = 8` and explicit padding.
+# API Contract & Integration Guide
 
-### C# Contract (Fixed)
-```csharp
-[StructLayout(LayoutKind.Sequential, Pack = 8)]
-public struct EntityState {
-    public ulong EntityId;
-    public WasmVector3 Position;
-    public WasmVector3 Velocity;
-    public long ReservedPadding; // Explicit 8-byte alignment
-}
-```
+## Request Headers
+- `X-Correlation-ID`: **Mandatory**. Every request must include a UUID v4. Used for distributed tracing.
+
+## Authentication
+- **Scheme**: Bearer Token (RS256 JWT).
+- **Validation**: Services verify tokens using the public key retrieved from the internal Vault or cached key store.
+
+## Rate Limiting
+- **Policy**: Sharded, IP-based sliding window (100 req/min).
+
+## Security Constraints
+- **Max Payload**: 64KB (JSON), 1MB (Asset Metadata).
+- **TLS**: Enforced `verify-full` for all database and service-to-service communication.
+- **Input Sanitization**: All strings are normalized via `NFKC` and filtered for control characters.
+- **Zero-Allocation Paths**: All high-frequency endpoints utilize `sync.Pool` (Go) or `ArrayPool<byte>` (C#) to mitigate GC jitter.
