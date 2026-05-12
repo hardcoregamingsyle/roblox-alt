@@ -5,55 +5,53 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"syscall"
 	"time"
-
-	"github.com/fsnotify/fsnotify"
-	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func main() {
-	r := gin.New()
-	r.SetTrustedProxies(nil) // Hardened: Trust no proxies by default
+var dbPool *pgxpool.Pool
 
-	r.Use(gin.Recovery())
-	r.Use(func(c *gin.Context) {
-		c.Header("Content-Security-Policy", "default-src 'none'; frame-ancestors 'none';")
-		c.Next()
+func securityMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("X-Frame-Options", "DENY")
+		w.Header().Set("Content-Security-Policy", "default-src 'self'; frame-ancestors 'none';")
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		next.ServeHTTP(w, r)
 	})
-
-	server := &http.Server{
-		Addr:         ":3000",
-		Handler:      r,
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 10 * time.Second,
-		IdleTimeout:  120 * time.Second,
-	}
-
-	go watchSecret("/run/secrets/csrf_secret")
-
-	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		log.Fatalf("Server failed: %s", err)
-	}
 }
 
-func watchSecret(path string) {
-	watcher, err := fsnotify.NewWatcher()
-	if err != nil {
-		return
-	}
-	defer watcher.Close()
+func main() {
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
 
-	// Robust retry with backoff for secret file availability
-	backoff := 1 * time.Second
-	for {
-		err = watcher.Add(path)
-		if err == nil {
-			break
-		}
-		time.Sleep(backoff)
-		if backoff < 60*time.Second {
-			backoff *= 2
-		}
+	dbURL := os.Getenv("DATABASE_URL")
+	config, err := pgxpool.ParseConfig(dbURL)
+	if err != nil {
+		log.Fatalf("Invalid DB config: %v", err)
 	}
+	config.ConnConfig.ConnectTimeout = 5 * time.Second
+
+	dbPool, err = pgxpool.NewWithConfig(ctx, config)
+	if err != nil {
+		log.Fatalf("Database connection failed: %v", err)
+	}
+	defer dbPool.Close()
+
+	port := os.Getenv("PORT")
+	if port == "" { port = "3000" }
+
+	server := &http.Server{Addr: ":" + port}
+	
+	go func() {
+		<-ctx.Done()
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		server.Shutdown(shutdownCtx)
+		dbPool.Close()
+	}()
+
+	log.Printf("Server starting on port %s", port)
+	log.Fatal(server.ListenAndServe())
 }
