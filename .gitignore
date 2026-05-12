@@ -4,3 +4,7 @@ dist/
 *.yaml
 *.swp
 .DS_Store
+.env
+.env.*
+.env.local
+*.log
