@@ -1,6 +1,4 @@
-github.com/gin-contrib/cors v1.7.3 h1:Wl1S7m1L44Y95K58w7T99G91S8q/jT4518/3854580=
-github.com/gin-contrib/csrf v1.0.2 h1:S319h1v4k7L73d31YJ5n42iP7tU2Z9+Z85m0y755555=
-github.com/gin-gonic/gin v1.10.1 h1:J51n3YJ28gY/S3s4dF/v3gG4z1424gO8124234=
-github.com/golang-jwt/jwt/v5 v5.3.2 h1:0L531D74p6s4Z114pQO6yv0U1j04SgS2P5K2z7g7+0o=
-github.com/google/uuid v1.6.0 h1:tQ41cW39791hP2xVw5sZ/M859nC4z34J9yWv7f3544o=
-golang.org/x/time v0.17.0 h1:3T19h1v4k7L73d31YJ5n42iP7tU2Z9+Z85m0y755555=
+github.com/golang-jwt/jwt/v5 v5.3.0 h1:0L531D74p6s4Z114pQO6yv0U1j04SgS2P5K2z7g7+0o=
+github.com/golang-jwt/jwt/v5 v5.3.0/go.mod h1:m21LSLhRkpgk6q2kJ9vJBF8XkZJpC/aYkL8a5V2l5f0=
+github.com/jackc/pgx/v5 v5.7.4 h1:8K9P230oO0W8j5oU06c74L5H6D0+9Z0=
+github.com/rs/cors v1.11.1 h1:8K9P230oO0W8j5oU06c74L5H6D0+9Z0=
