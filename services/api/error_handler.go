@@ -2,20 +2,40 @@ package main
 
 import (
 	"net/http"
-	"regexp"
-	"github.com/google/uuid"
+	"sync"
+	"github.com/bytecodealliance/wasmtime-go/v28"
+	"github.com/gin-gonic/gin"
 )
 
-var cidRegex = regexp.MustCompile(`^[a-fA-F0-9-]{36}$`)
+type WasmStorePool struct {
+	pool sync.Pool
+	engine *wasmtime.Engine
+}
 
-func CorrelationMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		cid := r.Header.Get("X-Correlation-ID")
-		if cid == "" || !cidRegex.MatchString(cid) {
-			cid = uuid.New().String()
-		}
-		
-		w.Header().Set("X-Correlation-ID", cid)
-		next.ServeHTTP(w, r)
-	})
+func NewWasmStorePool(engine *wasmtime.Engine) *WasmStorePool {
+	return &WasmStorePool{
+		engine: engine,
+		pool: sync.Pool{
+			New: func() interface{} {
+				return wasmtime.NewStore(engine)
+			},
+		},
+	}
+}
+
+func (p *WasmStorePool) Get() *wasmtime.Store {
+	return p.pool.Get().(*wasmtime.Store)
+}
+
+func (p *WasmStorePool) Put(s *wasmtime.Store) {
+	// Reset store context to prevent data leakage
+	s.GC() 
+	p.pool.Put(s)
+}
+
+func HandleWasmError(c *gin.Context, err error, store *wasmtime.Store, pool *WasmStorePool) {
+	if store != nil {
+		pool.Put(store)
+	}
+	c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal execution error"})
 }
