@@ -1,5 +1,3 @@
-github.com/golang-jwt/jwt/v5 v5.3.0 h1:0L531D74p6s4Z114pQO6yv0U1j04SgS2P5K2z7g7+0o=
-github.com/golang-jwt/jwt/v5 v5.3.0/go.mod h1:m21LSLhRkpgk6q2kJ9vJBF8XkZJpC/aYkL8a5V2l5f0=
-github.com/jellydator/ttlcache/v3 v3.3.0 h1:h1kL9D0Xf2d1yS1r927L3x020d20d020d020d020d02=
-github.com/jellydator/ttlcache/v3 v3.3.0/go.mod h1:20d020d020d020d020d020d020d020d020d020d020d=
-golang.org/x/sync v0.10.0 h1:3T19h1v4k7L73d31YJ5n42iP7tU2Z9+Z85m0y755555=
+github.com/golang-jwt/jwt/v5 v5.3.2 h1:0L531D74p6s4Z114pQO6yv0U1j04SgS2P5K2z7g7+0o=
+github.com/jellydator/ttlcache/v3 v3.3.0 h1:hM+x7+4K052S1h23Yx5pB2rL2+o9+J+7+J+7+J+7+J+0=
+golang.org/x/time v0.17.0 h1:3T19h1v4k7L73d31YJ5n42iP7tU2Z9+Z85m0y755555=
