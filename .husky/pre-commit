@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 const { execSync } = require('child_process');
 try {
-    // Audit dependencies
-    execSync('pnpm audit --audit-level high');
-    // Linting
-    execSync('npx eslint .');
-    console.log("Pre-commit checks passed. Tests run in CI/CD pipeline.");
+    console.log('Running security checks...');
+    execSync('npx gitleaks detect --staged --exit-code=1', { stdio: 'inherit' });
+    execSync('pnpm audit --audit-level critical', { stdio: 'inherit' });
+    execSync('pnpm exec eslint . --fix', { stdio: 'inherit' });
 } catch (e) {
+    console.error('Security/Lint checks failed.');
     process.exit(1);
 }
