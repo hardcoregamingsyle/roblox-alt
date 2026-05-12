@@ -2,24 +2,21 @@ package auth
 
 import (
 	"context"
-	"errors"
-	"time"
-	"github.com/golang-jwt/jwt/v5"
+	"github.com/redis/go-redis/v9"
 )
 
-var allowedKids map[string]bool
+// Fix 4: Atomic Redis Session Logic
+var sessionLuaScript = `
+local exists = redis.call("EXISTS", KEYS[1])
+if exists == 0 then
+    redis.call("SET", KEYS[1], ARGV[1], "EX", ARGV[2])
+    return 1
+else
+    return 0
+end
+`
 
-func init() {
-	allowedKids = make(map[string]bool)
-}
-
-func ValidateJWT(ctx context.Context, tokenStr string) (*NexusClaims, error) {
-	token, err := jwt.ParseWithClaims(tokenStr, &NexusClaims{}, func(t *jwt.Token) (interface{}, error) {
-		kid, ok := t.Header["kid"].(string)
-		if !ok || !allowedKids[kid] { return nil, errors.New("invalid kid") }
-		return FetchPublicKeyFromJWKS(kid), nil
-	}, jwt.WithIssuer("NexusEngine"), jwt.WithAudience("api.nexusengine.com"), jwt.WithLeeway(time.Second * 30))
-
-	if err != nil || !token.Valid { return nil, err }
-	return token.Claims.(*NexusClaims), nil
+func ValidateSession(ctx context.Context, rdb *redis.Client, jti string, ttl int) (bool, error) {
+	res, err := rdb.Eval(ctx, sessionLuaScript, []string{jti}, "active", ttl).Int()
+	return res == 1, err
 }
