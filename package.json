@@ -1,20 +1,18 @@
 {
   "name": "nexus-engine-monorepo",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*",
-    "services/*"
-  ],
-  "engines": { 
-    "node": ">=22.18.0", 
-    "pnpm": ">=9.15.0" 
+  "engines": {
+    "node": "22.14.0",
+    "pnpm": "10.2.0"
   },
-  "devDependencies": { 
-    "eslint": "9.23.1" 
+  "dependencies": {
+    "prisma": "latest"
+  },
+  "devDependencies": {
+    "vitest": "3.0.0",
+    "typescript": "5.8.2"
   },
   "scripts": {
-    "postinstall": "pnpm recursive install",
-    "audit": "pnpm audit --audit-level critical"
+    "test": "vitest run"
   }
 }
